@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import os
 
@@ -45,10 +46,14 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.net = nn.Sequential(
             nn.Flatten(),
+            nn.BatchNorm1d(784),
             nn.Linear(784, 64),
             nn.BatchNorm1d(64),
             nn.ReLU(),
-            nn.Linear(64, 10)
+            nn.Linear(64, 32),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
+            nn.Linear(32, 10)
         )
 
     def forward(self, x):
@@ -69,14 +74,19 @@ class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
 
 saved_model.eval()
 with torch.no_grad():
-    for X, y in test_loader:
-        pred = saved_model(X)
-        pred_label = pred.argmax(dim=1)
-        for i, boolean in enumerate(pred_label == y):
-            if not boolean:
-                plt.figure()
-                plt.imshow(X[i].squeeze(), cmap=plt.cm.binary)
-                plt.grid(False)
-                plt.xlabel(f"pred: {class_names[pred_label[i]]} / ans: {class_names[y[i]]}")
-                plt.show()
-                os.system("pause")
+    id = 12
+    pred = saved_model(test_loader.dataset[id][0])
+    true = test_loader.dataset[id][1]
+    pred_label = class_names[pred.argmax(1)]
+    print(f"{pred_label} ({100 * torch.max(F.softmax(pred, dim=1)):0.2f}%) / correct: {class_names[true]} ({100 * F.softmax(pred, dim=1)[0][true]:0.2f}%)")
+    # for X, y in test_loader:
+    #     pred = saved_model(X)
+    #     pred_label = pred.argmax(dim=1)
+    #     for i, boolean in enumerate(pred_label == y):
+    #         if not boolean:
+    #             plt.figure()
+    #             plt.imshow(X[i].squeeze(), cmap=plt.cm.binary)
+    #             plt.grid(False)
+    #             plt.xlabel(f"pred: {class_names[pred_label[i]]} / ans: {class_names[y[i]]}")
+    #             plt.show()
+    #             os.system("pause")

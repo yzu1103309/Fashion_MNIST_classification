@@ -47,8 +47,10 @@ class Net(nn.Module):
             nn.Flatten(),
             nn.BatchNorm1d(784),
             nn.Linear(784, 64),
+            nn.BatchNorm1d(64),
             nn.ReLU(),
             nn.Linear(64, 32),
+            nn.BatchNorm1d(32),
             nn.ReLU(),
             nn.Linear(32, 10)
         )
@@ -105,13 +107,15 @@ for e in range(epoch):
 
 
 # use the best model to predict
-# saved_model = Net()
-# saved_model.load_state_dict(torch.load("model.pth"))
-#
-# class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
-#                'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
-#
-# saved_model.eval()
+saved_model = Net()
+saved_model.load_state_dict(torch.load("model.pth"))
+
+class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
+               'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
+
+saved_model.eval()
+with torch.no_grad():
+    pred = saved_model(test_loader.dataset[12])
 # test_loss, correct = 0, 0
 # with torch.no_grad():
 #     for X, y in test_loader:
