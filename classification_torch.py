@@ -18,7 +18,7 @@ test_data = datasets.FashionMNIST(root='./data', train=False, download=True, tra
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 
-"""與 Tensorflow 不同，讀出圖片已經是 0~1 的數值，不需再除以 255"""
+"""與 Tensorflow 不同，讀出圖片ToTensor後已經是 0~1 的數值，不需再除以 255"""
 
 # Show the image
 # plt.figure()
